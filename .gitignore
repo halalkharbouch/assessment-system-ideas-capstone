@@ -1,0 +1,35 @@
+# .gitignore
+
+# Python (Django) settings
+venv/
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.env
+env/
+db.sqlite3
+.DS_Store
+media/
+staticfiles/
+*.sqlite3
+
+# Django settings
+/backend/local_settings.py
+/backend/db.sqlite3
+/backend/.env
+
+# Node (React) settings
+node_modules/
+npm-debug.log
+yarn-error.log
+build/
+.env
+
+# VSCode settings
+.vscode/
+
