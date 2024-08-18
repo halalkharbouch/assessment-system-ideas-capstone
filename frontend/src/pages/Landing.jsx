@@ -15,7 +15,7 @@ function Landing() {
           <input
             type="email"
             placeholder="Type your email"
-            className="p-3 border border-gray-300 rounded-l focus:outline-blue-500"
+            className="p-3 border border-gray-300 rounded-l focus:outline-blue-500 w-1/2"
           />
           <button className="bg-blue-500 ml-[-0.5rem] shadow-sm hover:shadow-md text-white px-6 py-3 rounded-r uppercase hover:bg-blue-600 transition duration-150 ease-in-out">
             Sign In
