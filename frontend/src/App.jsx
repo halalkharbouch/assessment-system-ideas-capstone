@@ -1,10 +1,16 @@
-function App() {
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Header from './components/Header';
+import Landing from './pages/Landing';
 
+function App() {
   return (
-    <>
-      <h1>IDEAS BAZE PROJECT</h1>
-    </>
-  )
+    <BrowserRouter>
+      <Header />
+      <Routes>
+        <Route path="/" element={<Landing />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
