@@ -32,6 +32,7 @@ class User(AbstractBaseUser):
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
+    has_set_password = models.BooleanField(default=False)
     
     objects = CustomUserManager()
     
@@ -46,6 +47,7 @@ class Student(models.Model):
     admission_number = models.CharField(max_length=20, unique=True)
     enrolled_course = models.ForeignKey('courses.Course', on_delete=models.SET_NULL, null=True, blank=True)
     modules = models.ManyToManyField('modules.Module')
+    results = models.ManyToManyField('results.Result', related_name='students')
 
     def __str__(self):
         return f"{self.admission_number}"

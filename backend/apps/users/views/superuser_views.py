@@ -10,3 +10,17 @@ class CreateSuperuserView(generics.CreateAPIView):
 class ListSuperusersView(generics.ListAPIView):
     queryset = User.objects.filter(is_superuser=True)
     serializer_class = SuperuserSerializer
+
+class UpdateSuperuserView(generics.UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = SuperuserSerializer
+    lookup_field = 'pk'
+
+class DeleteSuperuserView(generics.DestroyAPIView):
+    queryset = User.objects.all()
+    lookup_field = 'pk'
+
+class SuperuserDetailView(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = SuperuserSerializer
+    lookup_field = 'pk'

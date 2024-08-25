@@ -1,0 +1,58 @@
+.react-datepicker-wrapper {
+  display: block;
+  width: 100%;
+}
+
+.react-datepicker__input-container {
+  display: block;
+  width: 100%;
+}
+
+.react-datepicker__input-container input {
+  width: 100%;
+}
+
+.react-datepicker {
+  font-size: 0.9rem;
+}
+
+/* Month and year text */
+.react-datepicker__current-month,
+.react-datepicker-time__header,
+.react-datepicker-year-header {
+  color: white;
+}
+
+.react-datepicker__day--selected {
+  background-color: #6366f1; /* Indigo 500 */
+  color: white;
+}
+
+/* Day names (Mon, Tue, etc.) */
+.react-datepicker__day-name {
+  color: white;
+}
+
+/* Navigation arrows */
+.react-datepicker__navigation-icon::before {
+  border-color: white;
+}
+
+.react-datepicker__header {
+  background-color: #6366f1; /* Indigo 500 */
+  color: white;
+}
+
+.react-datepicker__day--selected {
+  background-color: #6366f1; /* Indigo 500 */
+}
+
+/* Time picker styles */
+.react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item--selected {
+    background-color: #6366f1; /* Indigo 500 */
+    color: white;
+  }
+  
+  .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item:hover {
+    background-color: #818cf8; /* Indigo 400 */
+  }
