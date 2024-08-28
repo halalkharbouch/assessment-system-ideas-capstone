@@ -6,7 +6,7 @@ from rest_framework_simplejwt.views import (
 from .views.student_views import ListStudentView, CreateStudentView, UpdateStudentView, DeleteStudentView, StudentDetailView
 from .views.superuser_views import ListSuperusersView, CreateSuperuserView, UpdateSuperuserView, SuperuserDetailView
 from .views.teacher_views import ListTeachersView, CreateTeacherView, TeacherDetailView, UpdateTeacherView, DeleteTeacherView
-from .views.user_views import ListUsersView, DeleteUserView, UpdateUserView, CheckUserExists, SetPassword, LoginView, LogoutView
+from .views.user_views import ListUsersView, DeleteUserView, UpdateUserView, CurrentUserView , CheckUserExists, SetPassword, LoginView, LogoutView
 
 urlpatterns = [
     path('users/create/student/', CreateStudentView.as_view(), name='create-student'),
@@ -26,6 +26,8 @@ urlpatterns = [
     path('users/', ListUsersView.as_view(), name='list-users'),
     path('users/delete/<int:pk>/', DeleteUserView.as_view(), name='delete-user'),
     path('users/update/<int:pk>/', UpdateUserView.as_view(), name='update-user'),
+    path('users/current/', CurrentUserView.as_view(), name='current-user'),
+
 
     # Authentication
     path('auth/check-user-exists/', CheckUserExists.as_view(), name='check-user-exists'),

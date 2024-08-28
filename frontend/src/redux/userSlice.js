@@ -5,22 +5,25 @@ const userSlice = createSlice({
   initialState: {
     userId: null,
     isFirstLogin: null,
-    currentUser: null, // Add currentUser to the state
+    currentUser: null,
   },
   reducers: {
     setUserInfo: (state, action) => {
       state.userId = action.payload.userId;
       state.isFirstLogin = action.payload.isFirstLogin;
-      state.currentUser = action.payload.currentUser; // Store currentUser
+      state.currentUser = action.payload.currentUser;
     },
     clearUserInfo: (state) => {
       state.userId = null;
-      state.isFirstLogin = false;
-      state.currentUser = null; // Clear currentUser
+      state.isFirstLogin = null;
+      state.currentUser = null;
+    },
+    updateCurrentUser: (state, action) => {
+      state.currentUser = action.payload;
     },
   },
 });
 
-export const { setUserInfo, clearUserInfo } = userSlice.actions;
+export const { setUserInfo, clearUserInfo, updateCurrentUser } = userSlice.actions;
 
 export default userSlice.reducer;

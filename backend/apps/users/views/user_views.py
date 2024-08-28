@@ -8,6 +8,36 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from ..serializers import UserSerializer, SetPasswordSerializer, SuperuserSerializer, TeacherSerializer, StudentSerializer
 from ..models import User, Student, Teacher
+from django.contrib.auth import get_user_model
+
+CurrentUser = get_user_model()
+
+class CurrentUserView(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        
+        # Prepare user data based on user type
+        if user.user_type == 'student':  # Check if user is a student
+            try:
+                student = Student.objects.get(user=user)
+                user_data = StudentSerializer(student).data
+            except Student.DoesNotExist:
+                return Response({"error": "No associated student record found."}, status=status.HTTP_400_BAD_REQUEST)
+        elif user.user_type == 'teacher' or user.is_superuser:  # Check if user is a teacher
+            try:
+                teacher = Teacher.objects.get(user=user)
+                user_data = TeacherSerializer(teacher).data
+            except Teacher.DoesNotExist:
+                return Response({"error": "No associated teacher record found."}, status=status.HTTP_400_BAD_REQUEST)
+        else:  # Handle other user types or superuser
+            user_data = UserSerializer(user).data
+
+        return Response({
+            "message": "User data retrieved successfully",
+            "user": user_data,
+        }, status=status.HTTP_200_OK)
 
 class ListUsersView(generics.ListAPIView):
     queryset = User.objects.all()
@@ -71,7 +101,7 @@ class SetPassword(APIView):
                 user_data = StudentSerializer(student).data
             except Student.DoesNotExist:
                 return Response({"error": "No associated student record found."}, status=400)
-        elif user.user_type == 'teacher':
+        elif user.user_type == 'teacher' or user.is_superuser:
             try:
                 teacher = Teacher.objects.get(user=user)
                 user_data = TeacherSerializer(teacher).data
@@ -86,6 +116,8 @@ class SetPassword(APIView):
             "access_token": access_token,
             "refresh_token": refresh_token,
         }, status=status.HTTP_200_OK)
+    
+
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
@@ -115,7 +147,7 @@ class LoginView(APIView):
                 user_data = StudentSerializer(student).data
             except Student.DoesNotExist:
                 return Response({"error": "No associated student record found."}, status=status.HTTP_400_BAD_REQUEST)
-        elif user.user_type == 'teacher':
+        elif user.user_type == 'teacher' or user.is_superuser:
             try:
                 teacher = Teacher.objects.get(user=user)
                 user_data = TeacherSerializer(teacher).data

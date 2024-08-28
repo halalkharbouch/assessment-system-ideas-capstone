@@ -1,34 +1,80 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import CreatableSelect from 'react-select/creatable';
+import Select from 'react-select';
 import 'react-datepicker/dist/react-datepicker.css';
-import CustomInput from '../CustomInput';
+import { useDispatch, useSelector } from 'react-redux';
 
-function AddAssessmentModal({ isOpen, onClose }) {
+function AddAssessmentModal({ isOpen, onClose, onCreate }) {
   const [startDateTime, setStartDateTime] = useState(null);
   const [endDateTime, setEndDateTime] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    module: null,
-    course: null,
+    module: 1,
+    course: 1,
     created_by: null,
     time_limit: 60,
     total_marks: 100,
     passing_marks: 90,
   });
 
-  const handleSubmit = async () => {
-    // add start date and end date to form data before submitting
-    await setFormData((prevData) => ({
+  console.log(formData);
+
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [selectedModule, setSelectedModule] = useState(null);
+
+  const dispatch = useDispatch();
+
+  const { currentUser } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    if (isOpen) {
+      setFormData((prevData) => ({
+        ...prevData,
+        created_by: currentUser.id,
+      }));
+    }
+  }, [isOpen, currentUser.id]);
+
+  // Prepare options from currentUser data
+  const courseOptions =
+    currentUser?.courses.map((course) => ({
+      value: course.id,
+      label: course.name,
+    })) || [];
+
+  const handleCourseChange = (selectedOption) => {
+    setSelectedCourse(selectedOption);
+    setFormData((prevData) => ({
       ...prevData,
-      start_date: startDateTime,
-      end_date: endDateTime,
+      course: selectedOption ? selectedOption.value : null,
     }));
 
-    console.log(formData);
+    // Reset module selection when course changes
+    setSelectedModule(null);
+  };
 
-    // Add your API call here
+  const handleModuleChange = (selectedOption) => {
+    console.log(selectedOption);
+
+    setSelectedModule(selectedOption);
+    setFormData((prevData) => ({
+      ...prevData,
+      module: selectedOption ? selectedOption.value : null,
+      module_is_new: selectedOption && selectedOption.__isNew__ ? true : false,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const dataToSubmit = {
+      ...formData,
+      start_date: startDateTime,
+      end_date: endDateTime,
+      created_by: currentUser.id,
+    };
+    onCreate(dataToSubmit);
   };
 
   const handleChange = (e) => {
@@ -74,14 +120,15 @@ function AddAssessmentModal({ isOpen, onClose }) {
             <label htmlFor="course" className="leading-7 text-sm text-gray-600">
               Course
             </label>
-            <CreatableSelect
+            <Select
               id="course"
               name="course"
-              //onChange={handleCourseChange}
-              //value={formData.enrolled_course}
-              options={{ label: 'test', value: 'test' }}
+              isCreatable={false} // Disable creation of new courses
+              value={selectedCourse}
+              onChange={handleCourseChange}
+              options={courseOptions}
               className="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 py-1 px-3 text-gray-700"
-              placeholder="Select a course"
+              placeholder="Select or add a course"
             />
           </div>
           <div className="w-1/2">
@@ -91,11 +138,22 @@ function AddAssessmentModal({ isOpen, onClose }) {
             <CreatableSelect
               id="module"
               name="module"
-              //onChange={handleCourseChange}
-              //value={formData.enrolled_course}
-              options={{ label: 'test', value: 'test' }}
+              value={selectedModule}
+              onChange={handleModuleChange}
+              options={
+                selectedCourse
+                  ? currentUser.courses
+                      .find((c) => c.id === selectedCourse.value)
+                      ?.modules.map((module) => ({
+                        value: module.id,
+                        label: module.name,
+                      })) || []
+                  : []
+              }
               className="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 py-1 px-3 text-gray-700"
-              placeholder="Select a module"
+              placeholder="Select or add a module"
+              isDisabled={!selectedCourse}
+              isCreatable={true} // Allow creation of new modules
             />
           </div>
         </div>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { addUser } from '../../services/users.service.js';
+import { addUser, fetchCurrentUser } from '../../services/users.service.js';
 import CreatableSelect from 'react-select/creatable';
 
 function AddTeacherModal({
@@ -91,7 +91,6 @@ function AddTeacherModal({
     try {
       const newTeacher = await addUser(formData, 'teacher');
       onAddTeacher(newTeacher);
-
       await onCourseUpdate();
       onClose();
     } catch (error) {

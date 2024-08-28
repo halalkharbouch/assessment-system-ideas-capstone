@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { updateUser } from '../../services/users.service.js';
+import { fetchCurrentUser, updateUser } from '../../services/users.service.js';
 import CreatableSelect from 'react-select/creatable';
-import { fetchCourses } from '../../services/course.service.js';
+import { updateCurrentUser } from '../../redux/userSlice.js';
+import { useDispatch } from 'react-redux';
 
 function UpdateTeacherModal({
   isOpen,
@@ -10,7 +11,7 @@ function UpdateTeacherModal({
   teacher,
   onUpdateTeacher,
   allCourses,
-  onCourseUpdate
+  onCourseUpdate,
 }) {
   const [formData, setFormData] = useState({
     user: { first_name: '', last_name: '', email: '' },
@@ -20,11 +21,7 @@ function UpdateTeacherModal({
   const [loading, setLoading] = useState(false);
   const [selectedCourses, setSelectedCourses] = useState([]);
 
-  console.log('Selected Courses', selectedCourses);
-  console.log('All Courses', allCourses);
-  console.log('FormData', formData);
-
-  console.log('Teacher', teacher);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (teacher) {
@@ -115,7 +112,10 @@ function UpdateTeacherModal({
       const updatedTeacher = await updateUser(formData, teacher.id, 'teacher');
       onUpdateTeacher(updatedTeacher);
 
-      await onCourseUpdate()
+      const updatedUser = await fetchCurrentUser();
+      dispatch(updateCurrentUser(updatedUser));
+
+      await onCourseUpdate();
 
       onClose();
     } catch (error) {

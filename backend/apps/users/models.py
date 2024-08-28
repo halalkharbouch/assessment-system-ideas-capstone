@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.utils.translation import gettext_lazy as _
+from django.db import transaction
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, first_name, last_name, password=None, **extra_fields):
@@ -12,10 +13,19 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+    @transaction.atomic
     def create_superuser(self, email, first_name, last_name, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-        return self.create_user(email, first_name, last_name, password, **extra_fields)
+        extra_fields.setdefault('is_active', True)
+        extra_fields.setdefault('user_type', 'superuser')
+
+        user = self.create_user(email, first_name, last_name, password, **extra_fields)
+        
+        # Create a Teacher object for the superuser
+        Teacher.objects.create(user=user)
+
+        return user
 
 class User(AbstractBaseUser):
     USER_TYPE_CHOICES = (
@@ -56,7 +66,6 @@ class Teacher(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, limit_choices_to={'user_type': 'teacher'})
     courses = models.ManyToManyField('courses.Course')
     modules = models.ManyToManyField('modules.Module')
-    created_assessments = models.ManyToManyField('assessments.Assessment', related_name='created_by_teachers')
 
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name}"

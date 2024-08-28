@@ -5,7 +5,9 @@ import Home from './pages/Home';
 import Students from './pages/Students';
 import Teachers from './pages/Teachers';
 import Assessments from './pages/Assessments';
-import PrivateRoute from './components/PrivateRoute'; // Import PrivateRoute
+import AssessmentManage from './pages/AssessmentManage';
+import PrivateRoute from './components/PrivateRoute';
+import AssessmentsForStudent from './pages/AssessmentsForStudent';
 
 function App() {
   return (
@@ -22,6 +24,15 @@ function App() {
         <Route
           path="/assessments"
           element={<PrivateRoute element={Assessments} />}
+        />
+
+        <Route
+          path="/assessment-manage/:assessmentId"
+          element={<PrivateRoute element={AssessmentManage} />}
+        />
+        <Route
+          path="/my-assessments"
+          element={<PrivateRoute element={AssessmentsForStudent} />}
         />
       </Routes>
     </BrowserRouter>

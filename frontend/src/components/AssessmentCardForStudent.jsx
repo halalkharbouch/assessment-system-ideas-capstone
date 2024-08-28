@@ -1,22 +1,12 @@
 import { format } from 'date-fns';
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { FaTrash } from 'react-icons/fa';
-import { useDispatch } from 'react-redux';
-import { updateCurrentUser } from '../redux/userSlice';
-import { updateAssessmentStatus } from '../services/aseessment.service.js';
+import { useNavigate } from 'react-router-dom';
 
-function AssessmentCard({ title, icon, assessment }) {
-  // fetch courses
-  const [courses, setCourses] = useState([]);
-  const dispatch = useDispatch();
+function AssessmentCardForStudent({ title, icon, assessment }) {
   const navigate = useNavigate();
-
-  console.log('Courses', courses);
 
   const formattedStartDate = format(
     new Date(assessment.start_date),
-    'dd MMM yyyy',
+    'dd MMM yyyy'
   );
   const formattedEndDate = format(new Date(assessment.end_date), 'dd MMM yyyy');
   const formattedStartTime = format(new Date(assessment.start_date), 'h:mm a');
@@ -25,35 +15,8 @@ function AssessmentCard({ title, icon, assessment }) {
   const [hours, minutes, seconds] = timeLimitString.split(':').map(Number);
   const totalMinutes = hours * 60 + minutes + seconds / 60;
 
-  const handleAssessmentManageClick = () => {
-    navigate(`/assessment-manage/${assessment.id}`);
-  };
-
-  const handleDeleteAssessment = async () => {
-    try {
-      const updatedUser = await deleteAssessment(assessment.id);
-
-      dispatch(updateCurrentUser(updatedUser));
-
-      navigate('/assessments');
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleStatusToggle = async () => {
-    try {
-      const newStatus = !assessment.is_published; // Toggle the publish status
-      const updatedAssessment = await updateAssessmentStatus(
-        assessment.id,
-        newStatus,
-      );
-
-      dispatch(updateCurrentUser(updatedAssessment));
-      navigate('/assessments');
-    } catch (error) {
-      console.error(error);
-    }
+  const handleViewAssessment = () => {
+    navigate(`/assessment/${assessment.id}`);
   };
 
   return (
@@ -81,19 +44,14 @@ function AssessmentCard({ title, icon, assessment }) {
             <h2 className="text-gray-900 text-lg font-bold title-font mb-3">
               {title}
             </h2>
-
-            <FaTrash
-              onClick={handleDeleteAssessment}
-              className="text-red-500 cursor-pointer hover:text-red-400"
-            />
           </div>
 
           <p className="leading-relaxed text-base">{assessment.description}</p>
           <p>
             This Assessment is part of {assessment.course.name} Course under{' '}
-            {assessment.module.name} Module, It will Run from{' '}
+            {assessment.module.name} Module. It will Run from{' '}
             {formattedStartDate} at exactly {formattedStartTime} to{' '}
-            {formattedEndDate} at exactly {formattedEndTime} it contains a total
+            {formattedEndDate} at exactly {formattedEndTime}. It contains a total
             of {assessment.questions.length} Questions with{' '}
             {assessment.total_marks} Total marks and the passing marks are{' '}
             {assessment.passing_marks} marks, with {totalMinutes} Minutes Time
@@ -102,7 +60,7 @@ function AssessmentCard({ title, icon, assessment }) {
 
           <div className="flex justify-between mt-4">
             <button
-              onClick={handleAssessmentManageClick}
+              onClick={handleViewAssessment}
               className="mt-3 text-indigo-500 inline-flex items-center cursor-pointer"
             >
               View Assessment
@@ -118,17 +76,6 @@ function AssessmentCard({ title, icon, assessment }) {
                 <path d="M5 12h14M12 5l7 7-7 7"></path>
               </svg>
             </button>
-
-            <button
-              onClick={handleStatusToggle}
-              className={`text-white border-0 py-2 px-6 focus:outline-none rounded ${
-                assessment.is_published
-                  ? 'bg-red-500 hover:bg-red-600'
-                  : 'bg-green-500 hover:bg-green-600'
-              }`}
-            >
-              {assessment.is_published ? 'Take Down' : 'Publish'}
-            </button>
           </div>
         </div>
       </div>
@@ -136,4 +83,4 @@ function AssessmentCard({ title, icon, assessment }) {
   );
 }
 
-export default AssessmentCard;
+export default AssessmentCardForStudent;

@@ -3,6 +3,7 @@ from .models import User, Student, Teacher
 from apps.courses.models import Course
 from apps.modules.models import Module
 from apps.assessments.models import Assessment
+from apps.assessments.serializer import AssessmentSerializer
 from apps.courses.serializer import CourseSerializer
 from apps.modules.serializer import ModuleSerializer
 
@@ -54,11 +55,16 @@ class TeacherSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     courses = CourseSerializer(many=True, required=False, allow_null=True)
     modules = ModuleSerializer(many=True, required=False, allow_null=True)
-    created_assessments = serializers.PrimaryKeyRelatedField(many=True, queryset=Assessment.objects.all(), required=False)
+    assessments_created = serializers.SerializerMethodField()
 
     class Meta:
         model = Teacher
         fields = '__all__'
+
+    def get_assessments_created(self, obj):
+        # Get the assessments created by the teacher
+        assessments = Assessment.objects.filter(created_by=obj)
+        return AssessmentSerializer(assessments, many=True).data
 
     
 class SuperuserSerializer(UserSerializer):

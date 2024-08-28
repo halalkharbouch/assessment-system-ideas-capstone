@@ -16,22 +16,28 @@ function Header() {
       const refreshToken = localStorage.getItem('refresh_token');
       const accessToken = localStorage.getItem('access_token');
 
-      await axiosInstance.post(
-        '/api/auth/logout/',
-        {
-          refresh_token: refreshToken,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        },
-      );
+      // await axiosInstance.post(
+      //   '/api/auth/logout/',
+      //   {
+      //     refresh_token: refreshToken,
+      //   },
+      //   {
+      //     headers: {
+      //       Authorization: `Bearer ${accessToken}`,
+      //     },
+      //   },
+      // );
 
+      // Clear tokens from localStorage
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       axiosInstance.defaults.headers.Authorization = null;
-      window.location.reload(); // or redirect to login page
+
+      // Dispatch the logout action to clear the Redux state
+      dispatch(logout());
+
+      // Reload the page or navigate to the login page
+      navigate('/'); // Or you can use window.location.reload();
     } catch (err) {
       console.error('Logout error: ', err.response?.data || err.message);
       // Handle the error appropriately
@@ -55,6 +61,14 @@ function Header() {
             }
           >
             <li>Dashboard</li>
+          </NavLink>
+          <NavLink
+            to="/my-assessments"
+            className={({ isActive }) =>
+              `text-gray-700 hover:text-blue-500  ${isActive && 'border-b'}`
+            }
+          >
+            <li>My Assessments</li>
           </NavLink>
           <NavLink
             to="/students"
