@@ -90,7 +90,7 @@ function AddTeacherModal({
     setLoading(true);
     try {
       const newTeacher = await addUser(formData, 'teacher');
-      onAddTeacher(newTeacher);
+      onAddTeacher(newTeacher.data.user);
       await onCourseUpdate();
       onClose();
     } catch (error) {

@@ -1,6 +1,13 @@
 import axiosInstance from '../api/axios';
 
-const fetchAssessments = () => {};
+export const fetchCurrentUserAssessments = async () => {
+  try {
+    const response = await axiosInstance.get('/api/assessments/current-user/');
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 export const createAssessment = async (assessmentData) => {
   try {
@@ -8,7 +15,19 @@ export const createAssessment = async (assessmentData) => {
       '/api/assessments/create/',
       assessmentData,
     );
-    return response.data.user;
+    return response.data.assessment;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const updateAssessment = async (assessmentId, assessmentData) => {
+  try {
+    const response = await axiosInstance.put(
+      `/api/assessments/update/${assessmentId}/`,
+      assessmentData,
+    );
+    return response.data.assessment;
   } catch (error) {
     console.error(error);
   }
@@ -25,13 +44,25 @@ export const fetchAssessment = async (assessmentId) => {
   }
 };
 
+export const deleteAssessment = async (assessmentId) => {
+  try {
+    const response = await axiosInstance.delete(
+      `/api/assessments/delete/${assessmentId}/`,
+    );
+    console.log('Deleted assessment from server', response);
+
+    return response;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export const addQuestion = async (assessmentId, questionData) => {
   try {
     const response = await axiosInstance.post(
       `/api/questions/${assessmentId}/create/`,
       questionData,
     );
-    console.log('Created question from server', response.data);
 
     return response;
   } catch (error) {
@@ -57,31 +88,21 @@ export const deleteQuestion = async (questionId) => {
     const response = await axiosInstance.delete(
       `/api/questions/${questionId}/delete/`,
     );
+    console.log('Deleted question from server', response);
+
     return response;
   } catch (error) {
     console.error(error);
   }
 };
 
-export const deleteAssessment = async (assessmentId) => {
-  try {
-    const response = await axiosInstance.delete(
-      `/api/assessments/delete/${assessmentId}/`,
-    );
-    console.log('Deleted assessment from server', response.data);
-
-    return response.data.user;
-  } catch (error) {
-    console.error(error);
-  }
-};
 export const updateAssessmentStatus = async (assessmentId, status) => {
   try {
     const response = await axiosInstance.patch(
       `/api/assessments/update-status/${assessmentId}/`,
       { is_published: status },
     );
-    return response.data.user;
+    return response.data.assessment;
   } catch (error) {
     console.error(error);
   }

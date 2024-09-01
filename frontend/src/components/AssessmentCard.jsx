@@ -4,9 +4,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FaTrash } from 'react-icons/fa';
 import { useDispatch } from 'react-redux';
 import { updateCurrentUser } from '../redux/userSlice';
-import { updateAssessmentStatus } from '../services/aseessment.service.js';
+import {
+  deleteAssessment,
+  updateAssessmentStatus,
+} from '../services/aseessment.service.js';
+import { toast } from 'react-toastify';
 
-function AssessmentCard({ title, icon, assessment }) {
+function AssessmentCard({ icon, assessment, onDelete, onStatusToggle }) {
   // fetch courses
   const [courses, setCourses] = useState([]);
   const dispatch = useDispatch();
@@ -31,14 +35,19 @@ function AssessmentCard({ title, icon, assessment }) {
 
   const handleDeleteAssessment = async () => {
     try {
-      const updatedUser = await deleteAssessment(assessment.id);
-
-      dispatch(updateCurrentUser(updatedUser));
-
-      navigate('/assessments');
+      const response = await deleteAssessment(assessment.id);
+      if (response.status === 204) {
+        onDelete(assessment.id);
+        toast.success('Assessment deleted successfully');
+      }
     } catch (error) {
       console.error(error);
+      toast.error('Failed to delete assessment');
     }
+  };
+
+  const handleViewStudentScoresClick = () => {
+    navigate(`/student-scores/${assessment.id}`);
   };
 
   const handleStatusToggle = async () => {
@@ -49,10 +58,11 @@ function AssessmentCard({ title, icon, assessment }) {
         newStatus,
       );
 
-      dispatch(updateCurrentUser(updatedAssessment));
-      navigate('/assessments');
+      onStatusToggle(updatedAssessment);
+      toast.success('Assessment status updated successfully');
     } catch (error) {
       console.error(error);
+      toast.error('Failed to update assessment status');
     }
   };
 
@@ -79,7 +89,7 @@ function AssessmentCard({ title, icon, assessment }) {
         <div className="flex-grow">
           <div className="flex justify-between">
             <h2 className="text-gray-900 text-lg font-bold title-font mb-3">
-              {title}
+              {assessment.name}
             </h2>
 
             <FaTrash
@@ -106,6 +116,23 @@ function AssessmentCard({ title, icon, assessment }) {
               className="mt-3 text-indigo-500 inline-flex items-center cursor-pointer"
             >
               View Assessment
+              <svg
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                className="w-4 h-4 ml-2"
+                viewBox="0 0 24 24"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7"></path>
+              </svg>
+            </button>
+            <button
+              onClick={handleViewStudentScoresClick}
+              className="mt-3 text-indigo-500 inline-flex items-center cursor-pointer"
+            >
+              View Students Scores
               <svg
                 fill="none"
                 stroke="currentColor"

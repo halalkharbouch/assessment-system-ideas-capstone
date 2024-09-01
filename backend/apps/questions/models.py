@@ -13,6 +13,7 @@ class Question(models.Model):
     question_type = models.CharField(max_length=9, choices=QUESTION_TYPE_CHOICES)
     marks = models.PositiveIntegerField()
     is_true = models.BooleanField(null=True, blank=True, default=0)
+    course = models.ForeignKey('courses.Course', on_delete=models.CASCADE, related_name='questions')
 
     def save(self, *args, **kwargs):
         if self.question_type == 'tf':

@@ -5,13 +5,18 @@ import { fetchUsers, deleteUser } from '../services/users.service.js';
 import UpdateTeacherModal from '../components/Modals/UpdateTeacherModal.jsx';
 import { fetchCourses } from '../services/course.service.js';
 import { fetchModules } from '../services/module.service.js';
-import axiosInstance from '../api/axios.js';
+import Loading from '../components/Loading.jsx';
 
 function Teachers() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [teachers, setTeachers] = useState([]);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const teachersPerPage = 10;
 
   const [allCourses, setAllCourses] = useState([]);
   const [allModules, setAllModules] = useState([]);
@@ -46,13 +51,20 @@ function Teachers() {
     loadModules();
     loadCourses();
     loadTeachers();
+    setLoading(false);
   }, []);
+
+  if (loading) {
+    return <Loading />;
+  }
 
   const handleAddTeacher = (newTeacher) => {
     setTeachers((prevTeachers) => [...prevTeachers, newTeacher]);
   };
 
   const handleDeleteTeacher = async (teacherId) => {
+    if (!window.confirm('Are you sure you want to delete this question?'))
+      return;
     await deleteUser(teacherId);
     setTeachers(teachers.filter((teacher) => teacher.user.id !== teacherId));
   };
@@ -67,10 +79,39 @@ function Teachers() {
     );
   };
 
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    setCurrentPage(1); // Reset to first page on new search
+  };
+
   const updateCourses = async () => {
     const updatedCourses = await fetchCourses();
     setAllCourses(updatedCourses);
   };
+
+  // Filter teachers based on search query
+  const filteredTeachers = teachers.filter(
+    (teacher) =>
+      teacher.user.first_name
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
+      teacher.user.last_name
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
+      teacher.user.email.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
+  // Pagination logic
+  const indexOfLastTeacher = currentPage * teachersPerPage;
+  const indexOfFirstTeacher = indexOfLastTeacher - teachersPerPage;
+  const currentTeachers = filteredTeachers.slice(
+    indexOfFirstTeacher,
+    indexOfLastTeacher,
+  );
+
+  const totalPages = Math.ceil(filteredTeachers.length / teachersPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <section className="text-gray-600 body-font">
@@ -80,8 +121,10 @@ function Teachers() {
             type="text"
             placeholder="Search"
             className="bg-transparent focus:outline-none w-full"
+            value={searchQuery}
+            onChange={handleSearchChange}
           />
-          <button>
+          <button type="button">
             <FaSearch className="text-slate-600" />
           </button>
         </form>
@@ -107,7 +150,7 @@ function Teachers() {
               </tr>
             </thead>
             <tbody>
-              {teachers.map((teacher) => (
+              {currentTeachers.map((teacher) => (
                 <tr key={teacher.id}>
                   <td className="px-4 py-3">
                     {teacher.user.first_name} {teacher.user.last_name}
@@ -134,9 +177,25 @@ function Teachers() {
             </tbody>
           </table>
         </div>
-        <div className="flex pl-4 mt-4 w-full mx-auto">
-          
 
+        {/* Pagination */}
+        <div className="flex justify-center my-5">
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index + 1}
+              onClick={() => paginate(index + 1)}
+              className={`px-3 py-1 mx-1 border rounded ${
+                currentPage === index + 1
+                  ? 'bg-indigo-500 text-white'
+                  : 'bg-gray-100'
+              }`}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex pl-4 mt-4 w-full mx-auto">
           <button
             onClick={openModal}
             className="flex ml-auto text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded"

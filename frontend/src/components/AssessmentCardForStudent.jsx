@@ -1,22 +1,36 @@
+import { useState } from 'react';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
-
-function AssessmentCardForStudent({ title, icon, assessment }) {
+import ConfirmationModal from './Modals/ConfirmationModal';
+function AssessmentCardForStudent({
+  title,
+  icon,
+  assessment,
+  courseName,
+  moduleName,
+}) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const formattedStartDate = format(
     new Date(assessment.start_date),
-    'dd MMM yyyy'
+    'dd MMM yyyy',
   );
   const formattedEndDate = format(new Date(assessment.end_date), 'dd MMM yyyy');
   const formattedStartTime = format(new Date(assessment.start_date), 'h:mm a');
   const formattedEndTime = format(new Date(assessment.end_date), 'h:mm a');
-  const timeLimitString = assessment.time_limit;
-  const [hours, minutes, seconds] = timeLimitString.split(':').map(Number);
-  const totalMinutes = hours * 60 + minutes + seconds / 60;
 
   const handleViewAssessment = () => {
-    navigate(`/assessment/${assessment.id}`);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleContinue = () => {
+    setIsModalOpen(false);
+    navigate(`/take-assessment/${assessment.id}`);
   };
 
   return (
@@ -48,22 +62,30 @@ function AssessmentCardForStudent({ title, icon, assessment }) {
 
           <p className="leading-relaxed text-base">{assessment.description}</p>
           <p>
-            This Assessment is part of {assessment.course.name} Course under{' '}
-            {assessment.module.name} Module. It will Run from{' '}
-            {formattedStartDate} at exactly {formattedStartTime} to{' '}
-            {formattedEndDate} at exactly {formattedEndTime}. It contains a total
-            of {assessment.questions.length} Questions with{' '}
+            This Assessment is part of {courseName} Course under {moduleName}{' '}
+            Module. It will Run from {formattedStartDate} at exactly{' '}
+            {formattedStartTime} to {formattedEndDate} at exactly{' '}
+            {formattedEndTime}. It contains a total of{' '}
+            {assessment.questions.length} Questions with{' '}
             {assessment.total_marks} Total marks and the passing marks are{' '}
-            {assessment.passing_marks} marks, with {totalMinutes} Minutes Time
-            Limit
+            {assessment.passing_marks} marks, with{' '}
+            {assessment.time_limit
+              .split(':')
+              .map(Number)
+              .reduce((acc, time, idx) => {
+                if (idx === 0) return acc + time * 60;
+                if (idx === 1) return acc + time;
+                return acc + time / 60;
+              }, 0)}{' '}
+            Minutes Time Limit
           </p>
 
           <div className="flex justify-between mt-4">
             <button
               onClick={handleViewAssessment}
-              className="mt-3 text-indigo-500 inline-flex items-center cursor-pointer"
+              className="mt-3 ml-auto text-indigo-500 inline-flex items-center cursor-pointer"
             >
-              View Assessment
+              Take Assessment
               <svg
                 fill="none"
                 stroke="currentColor"
@@ -79,6 +101,14 @@ function AssessmentCardForStudent({ title, icon, assessment }) {
           </div>
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        assessment={assessment}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onContinue={handleContinue}
+      />
     </div>
   );
 }

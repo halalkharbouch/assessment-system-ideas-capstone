@@ -5,7 +5,6 @@ export const fetchUsers = async (userType) => {
   try {
     const response = await axiosInstance.get(`/api/users/${userType}/`);
     const data = response.data;
-    console.log('all teachers', data);
     return data;
   } catch (error) {
     console.error('Error fetching users:', error);
@@ -20,8 +19,9 @@ export const addUser = async (data, userType) => {
       `/api/users/create/${userType}/`,
       data,
     );
-    const result = response.data;
-    return result.data;
+    console.log(response.data);
+
+    return response;
   } catch (error) {
     console.error('Error adding user:', error);
     throw error;
@@ -47,8 +47,7 @@ export const updateUser = async (data, id, userType) => {
       `/api/users/update/${userType}/${id}/`,
       data,
     );
-    const result = response.data;
-    return result.data;
+    return response.data.user;
   } catch (error) {
     console.error('Error updating user:', error);
     throw error;

@@ -24,4 +24,5 @@ urlpatterns = [
     path('api/', include('apps.modules.urls')),
     path('api/', include('apps.assessments.urls')),
     path('api/', include('apps.questions.urls')),
+    path('api/', include('apps.results.urls')),
 ]

@@ -81,7 +81,7 @@ class CreateTeacherView(APIView):
         # Serialize the teacher object
         serializer = TeacherSerializer(teacher)
 
-        return Response({"message": "Teacher created successfully", "data": serializer.data}, status=status.HTTP_201_CREATED)
+        return Response({"message": "Teacher created successfully", "user": serializer.data}, status=status.HTTP_201_CREATED)
 
 
 
@@ -164,7 +164,7 @@ class UpdateTeacherView(APIView):
         # Serialize the teacher object
         serializer = TeacherSerializer(teacher)
 
-        return Response({"message": "Teacher updated successfully", "data": serializer.data}, status=status.HTTP_200_OK)
+        return Response({"message": "Teacher updated successfully", "user": serializer.data}, status=status.HTTP_200_OK)
 
     
 class DeleteTeacherView(generics.DestroyAPIView):

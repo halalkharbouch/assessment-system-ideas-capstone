@@ -3,7 +3,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
-from .views.student_views import ListStudentView, CreateStudentView, UpdateStudentView, DeleteStudentView, StudentDetailView
+from .views.student_views import ListStudentView, CreateStudentView, UpdateStudentView, DeleteStudentView, StudentDetailView, score_trends, pass_rate, assessment_performance, radar_chart_data, assessment_performance_for_insights
 from .views.superuser_views import ListSuperusersView, CreateSuperuserView, UpdateSuperuserView, SuperuserDetailView
 from .views.teacher_views import ListTeachersView, CreateTeacherView, TeacherDetailView, UpdateTeacherView, DeleteTeacherView
 from .views.user_views import ListUsersView, DeleteUserView, UpdateUserView, CurrentUserView , CheckUserExists, SetPassword, LoginView, LogoutView
@@ -27,6 +27,12 @@ urlpatterns = [
     path('users/delete/<int:pk>/', DeleteUserView.as_view(), name='delete-user'),
     path('users/update/<int:pk>/', UpdateUserView.as_view(), name='update-user'),
     path('users/current/', CurrentUserView.as_view(), name='current-user'),
+
+    path('score-trends/', score_trends, name='score-trends'),
+    path('pass-rate/', pass_rate, name='pass-rate'),
+    path('assessment-performance/', assessment_performance, name='assessment-performance'),
+    path('radar-data/', radar_chart_data, name='radar-chart-data'),
+    path('assessment-performance-for-insights/', assessment_performance_for_insights, name='assessment-performance-for-insights'),
 
 
     # Authentication

@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from django.contrib.auth import authenticate, login, logout 
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from ..serializers import UserSerializer, SetPasswordSerializer, SuperuserSerializer, TeacherSerializer, StudentSerializer
+from ..serializers import UserSerializer, SetPasswordSerializer, SuperuserSerializer, TeacherSerializer, StudentSerializer, StudentMiniSerializer
 from ..models import User, Student, Teacher
 from django.contrib.auth import get_user_model
 
@@ -22,7 +22,7 @@ class CurrentUserView(generics.RetrieveAPIView):
         if user.user_type == 'student':  # Check if user is a student
             try:
                 student = Student.objects.get(user=user)
-                user_data = StudentSerializer(student).data
+                user_data = StudentMiniSerializer(student).data
             except Student.DoesNotExist:
                 return Response({"error": "No associated student record found."}, status=status.HTTP_400_BAD_REQUEST)
         elif user.user_type == 'teacher' or user.is_superuser:  # Check if user is a teacher
@@ -68,12 +68,15 @@ class CheckUserExists(APIView):
 class SetPassword(APIView):
     def post(self, request, pk):
         try:
+            print("PK: ", pk)
+            print("DATA: ", request.data)
             user = User.objects.get(pk=pk)
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=404)
 
         # Get the password from request data
         password = request.data.get('password')
+        print("PASWORD: ", password)
         if not password:
             return Response({"error": "Password is required."}, status=400)
 
@@ -98,7 +101,7 @@ class SetPassword(APIView):
         if user.user_type == 'student':
             try:
                 student = Student.objects.get(user=user)
-                user_data = StudentSerializer(student).data
+                user_data = StudentMiniSerializer(student).data
             except Student.DoesNotExist:
                 return Response({"error": "No associated student record found."}, status=400)
         elif user.user_type == 'teacher' or user.is_superuser:
@@ -144,7 +147,8 @@ class LoginView(APIView):
         if user.user_type == 'student':
             try:
                 student = Student.objects.get(user=user)
-                user_data = StudentSerializer(student).data
+                user_data = StudentMiniSerializer(student).data
+                print("serialized data", user_data)
             except Student.DoesNotExist:
                 return Response({"error": "No associated student record found."}, status=status.HTTP_400_BAD_REQUEST)
         elif user.user_type == 'teacher' or user.is_superuser:

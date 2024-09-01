@@ -128,6 +128,23 @@ function UpdateStudentModal({
               className="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 py-1 px-3 text-gray-700"
             />
           </div>
+
+          <div className="mb-4">
+            <label
+              htmlFor="enrolled_course"
+              className="leading-7 text-sm text-gray-600"
+            >
+              Course
+            </label>
+            <CreatableSelect
+              isClearable
+              options={courses}
+              value={selectedCourses}
+              onChange={handleCourseChange}
+              className="mb-4 w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 py-1 px-3 text-gray-700"
+            />
+          </div>
+
           <div className="mb-4">
             <label htmlFor="email" className="leading-7 text-sm text-gray-600">
               Email
@@ -157,21 +174,7 @@ function UpdateStudentModal({
               className="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 py-1 px-3 text-gray-700"
             />
           </div>
-          <div className="mb-4">
-            <label
-              htmlFor="enrolled_course"
-              className="leading-7 text-sm text-gray-600"
-            >
-              Course
-            </label>
-            <CreatableSelect
-              isClearable
-              options={courses}
-              value={selectedCourses}
-              onChange={handleCourseChange}
-              className="mb-4 w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 py-1 px-3 text-gray-700"
-            />
-          </div>
+
           <div className="flex justify-end">
             <button
               className="text-gray-700 mr-2"

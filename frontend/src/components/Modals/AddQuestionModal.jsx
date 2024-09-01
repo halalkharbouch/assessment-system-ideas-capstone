@@ -4,7 +4,12 @@ import Select from 'react-select';
 import axiosInstance from '../../api/axios';
 import { addQuestion } from '../../services/aseessment.service';
 
-function AddQuestionModal({ isOpen, onClose, onAddQuestion, assessmentId }) {
+function AddQuestionModal({
+  isOpen,
+  onClose,
+  onAddQuestion,
+  assessmentId,
+}) {
   const [formData, setFormData] = useState({
     question_text: '',
     options: [],
@@ -98,7 +103,7 @@ function AddQuestionModal({ isOpen, onClose, onAddQuestion, assessmentId }) {
 
     try {
       const response = await addQuestion(assessmentId, formData);
-      onAddQuestion(response.data);
+      onAddQuestion(response.data.question);
       onClose();
     } catch (error) {
       console.error(error);

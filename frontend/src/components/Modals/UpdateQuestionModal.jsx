@@ -19,7 +19,8 @@ function UpdateQuestionModal({
   const [optionText, setOptionText] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
+  console.log(formData);
+  
   useEffect(() => {
     if (isOpen && questionData) {
       const correctOption = questionData.choices.find(
@@ -107,6 +108,7 @@ function UpdateQuestionModal({
     const updatedData = {
       question_text: formData.question_text,
       question_type: formData.question_type,
+      marks: formData.marks,
       choices:
         formData.question_type === 'mcq'
           ? formData.options.map((option) => ({

@@ -1,17 +1,22 @@
-import React from 'react';
-import { Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { Navigate } from 'react-router-dom';
 
-const PrivateRoute = ({ element: Component, ...rest }) => {
+function PrivateRoute({ element: Component, allowedRoles }) {
   const { isAuthenticated } = useSelector((state) => state.auth);
+  const { currentUser } = useSelector((state) => state.user);
 
-  // If the user is not authenticated, redirect to the landing page
+  console.log(allowedRoles);
+  
+
   if (!isAuthenticated) {
-    return <Navigate to="/" />;
+    return <Navigate to="/" replace />;
   }
 
-  // If the user is authenticated, render the requested component
-  return <Component {...rest} />;
-};
+  if (!allowedRoles.includes(currentUser.user.user_type)) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  return <Component />;
+}
 
 export default PrivateRoute;

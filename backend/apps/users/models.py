@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.utils.translation import gettext_lazy as _
+from django.db.models import Avg, Max, Min, Count
 from django.db import transaction
 
 class CustomUserManager(BaseUserManager):
@@ -58,6 +59,35 @@ class Student(models.Model):
     enrolled_course = models.ForeignKey('courses.Course', on_delete=models.SET_NULL, null=True, blank=True)
     modules = models.ManyToManyField('modules.Module')
     results = models.ManyToManyField('results.Result', related_name='students')
+    completed_assessments = models.ManyToManyField('assessments.Assessment', blank=True, related_name='completed_by_students')
+    @property
+    def average_score(self):
+        # Aggregates average score from related results
+        return self.results.aggregate(Avg('score'))['score__avg'] or 0
+
+    @property
+    def highest_score(self):
+        # Aggregates highest score from related results
+        
+        return self.results.aggregate(Max('score'))['score__max'] or 0
+
+    @property
+    def lowest_score(self):
+        # Aggregates lowest score from related results
+        return self.results.aggregate(Min('score'))['score__min'] or 0
+
+    @property
+    def pass_rate(self):
+        # Get total number of assessments taken by the student
+        total_assessments = self.results.count()
+        # Calculate the number of assessments passed
+        passed_assessments = self.results.filter(
+            score__gte=models.F('assessment__passing_marks')
+        ).count()
+
+        # Return pass rate as a percentage
+        return (passed_assessments / total_assessments * 100) if total_assessments else 0
+
 
     def __str__(self):
         return f"{self.admission_number}"

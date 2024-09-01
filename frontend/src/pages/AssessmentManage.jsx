@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { format } from 'date-fns';
+import AddQuestionSettingsModal from '../components/Modals/AddQuestionSettingsModal';
+import EditAssessmentModal from '../components/Modals/EditAssessmentModal';
 
-import { fetchAssessment } from '../services/aseessment.service';
+import {
+  deleteAssessment,
+  fetchAssessment,
+} from '../services/aseessment.service';
 import Loading from '../components/Loading';
 import {
   FaQuestionCircle,
@@ -17,6 +22,9 @@ import {
 import AddQuestionModal from '../components/Modals/AddQuestionModal';
 import UpdateQuestionModal from '../components/Modals/UpdateQuestionModal';
 import { deleteQuestion } from '../services/aseessment.service';
+import GenerateQuestionsAIModal from '../components/Modals/GenerateQuestionsAIModal';
+import { toast } from 'react-toastify';
+import QuestionBankModal from '../components/Modals/QuestionBankModal';
 
 function AssessmentManage() {
   const { assessmentId } = useParams();
@@ -26,9 +34,25 @@ function AssessmentManage() {
   const [isUpdateQuestionModalOpen, setIsUpdateQuestionModalOpen] =
     useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isGenerateQuestionsAIModalOpen, setIsGenerateQuestionsAIModalOpen] =
+    useState(false);
+  const [isEditAssessmentModalOpen, setIsEditAssessmentModalOpen] =
+    useState(false);
+  const [isQuestionBankModalOpen, setIsQuestionBankModalOpen] = useState(false);
+  const [totalComputedMarks, setTotalComputedMarks] = useState(0);
+
+  console.log('AA', assessment);
+
+  const navigate = useNavigate();
 
   const openAddQuestionModal = () => setIsAddQuestionModalOpen(true);
   const closeAddQuestionModal = () => setIsAddQuestionModalOpen(false);
+
+  const openGenerateQuestionsAIModal = () =>
+    setIsGenerateQuestionsAIModalOpen(true);
+  const closeGenerateQuestionsAIModal = () =>
+    setIsGenerateQuestionsAIModalOpen(false);
 
   const openUpdateQuestionModal = (question) => {
     setSelectedQuestion(question);
@@ -38,6 +62,15 @@ function AssessmentManage() {
     setSelectedQuestion(null);
     setIsUpdateQuestionModalOpen(false);
   };
+
+  const openAddQuestionSettingsModal = () => setIsModalOpen(true);
+  const closeAddQuestionSettingsModal = () => setIsModalOpen(false);
+
+  const openEditAssessmentModal = () => setIsEditAssessmentModalOpen(true);
+  const closeEditAssessmentModal = () => setIsEditAssessmentModalOpen(false);
+
+  const openQuestionBankModal = () => setIsQuestionBankModalOpen(true);
+  const closeQuestionBankModal = () => setIsQuestionBankModalOpen(false);
 
   useEffect(() => {
     const loadAssessment = async () => {
@@ -50,8 +83,23 @@ function AssessmentManage() {
         setLoading(false);
       }
     };
+
     loadAssessment();
   }, [assessmentId]);
+
+  useEffect(() => {
+    const computeTotalMarks = () => {
+      if (assessment) {
+        let totalMarks = 0;
+        assessment.questions.forEach((question) => {
+          totalMarks += question.marks;
+        });
+        setTotalComputedMarks(totalMarks);
+      }
+    };
+
+    computeTotalMarks();
+  }, [assessment]);
 
   const [selectedOption, setSelectedOption] = useState('');
 
@@ -78,11 +126,13 @@ function AssessmentManage() {
     // add the question data to the assessment.questions
     setAssessment((prevAssessment) => ({
       ...prevAssessment,
-      questions: [...prevAssessment.questions, questionData.question],
+      questions: [...prevAssessment.questions, questionData],
     }));
   };
 
   const handleDeleteQuestion = async (questionId) => {
+    if (!window.confirm('Are you sure you want to delete this question?'))
+      return;
     try {
       await deleteQuestion(questionId);
 
@@ -112,6 +162,47 @@ function AssessmentManage() {
     }));
   };
 
+  const handleAddQuestions = (newQuestions) => {
+    setAssessment((prevAssessment) => ({
+      ...prevAssessment,
+      questions: [...prevAssessment.questions, ...newQuestions],
+    }));
+  };
+
+  const handleGenerateQuestionsAI = (newQuestions) => {
+    setAssessment((prevAssessment) => ({
+      ...prevAssessment,
+      questions: [...prevAssessment.questions, ...newQuestions],
+    }));
+  };
+
+  const handleUpdateAssessment = (updatedAssessment) => {
+    setAssessment(updatedAssessment);
+  };
+
+  const handleDeleteAssessment = async () => {
+    if (!window.confirm('Are you sure you want to delete this question?'))
+      return;
+    try {
+      console.log('delete assessment', assessment);
+
+      const response = await deleteAssessment(assessment.id);
+      if (response.status === 204) navigate('/assessments');
+    } catch (error) {
+      toast.error(
+        'An error occurred while deleting assessment pleas try again',
+      );
+      console.log(error);
+    }
+  };
+
+  const handleAddQuestionsFromBank = (questions) => {
+    setAssessment((prevAssessment) => ({
+      ...prevAssessment,
+      questions: [...prevAssessment.questions, ...questions],
+    }));
+  };
+
   return (
     <section className="text-gray-600 body-font">
       <div className="container px-5 py-24 mx-auto">
@@ -122,9 +213,20 @@ function AssessmentManage() {
           <p className="text-base leading-relaxed xl:w-2/4 lg:w-3/4 mx-auto">
             {assessment.description}
           </p>
-          <button className="flex mx-auto mt-4 text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg">
-            Edit Assessment
-          </button>
+          <div className="flex mx-auto justify-center space-x-4">
+            <button
+              onClick={openEditAssessmentModal}
+              className="mt-4 text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg"
+            >
+              Edit Assessment
+            </button>
+            <button
+              onClick={handleDeleteAssessment}
+              className="mt-4 text-white bg-red-500 border-0 py-2 px-8 focus:outline-none hover:bg-red-600 rounded text-lg"
+            >
+              Delete Assessment
+            </button>
+          </div>
         </div>
 
         <div className="flex flex-wrap lg:w-4/5 sm:mx-auto sm:mb-2 -mx-2">
@@ -149,6 +251,14 @@ function AssessmentManage() {
               <FaQuestionCircle className="text-indigo-500 w-6 h-6 flex-shrink-0 mr-4" />
               <span className="title-font font-medium">
                 {assessment.questions.length} Questions
+              </span>
+            </div>
+          </div>
+          <div className="p-2 sm:w-1/2 w-full">
+            <div className="bg-gray-100 rounded flex p-4 h-full items-center">
+              <FaQuestionCircle className="text-indigo-500 w-6 h-6 flex-shrink-0 mr-4" />
+              <span className="title-font font-medium">
+                {totalComputedMarks} Total Accumulated Marks from Questions
               </span>
             </div>
           </div>
@@ -199,7 +309,22 @@ function AssessmentManage() {
             Questions
           </h1>
           <div className="flex gap-4">
-            <button className="text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded">
+            <button
+              onClick={openQuestionBankModal}
+              className="text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded"
+            >
+              Questions Bank
+            </button>
+            <button
+              onClick={openAddQuestionSettingsModal}
+              className="text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded"
+            >
+              Bulk Generate
+            </button>
+            <button
+              onClick={openGenerateQuestionsAIModal}
+              className="text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded"
+            >
               Generate Questions AI
             </button>
             <button
@@ -295,7 +420,9 @@ function AssessmentManage() {
                   )}
 
                   <div className="flex justify-between items-center mt-2">
-                    <p>{question.marks} Mark{question.marks > 1 ? 's' : ''}</p>
+                    <p>
+                      {question.marks} Mark{question.marks > 1 ? 's' : ''}
+                    </p>
                     <div className="flex gap-4">
                       <button
                         onClick={() => openUpdateQuestionModal(question)}
@@ -339,6 +466,15 @@ function AssessmentManage() {
           ))}
         </div>
       </div>
+      
+
+      <EditAssessmentModal
+        isOpen={isEditAssessmentModalOpen}
+        onClose={closeEditAssessmentModal}
+        assessmentData={assessment}
+        onUpdate={handleUpdateAssessment}
+        timeLimit={totalMinutes}
+      />
 
       <AddQuestionModal
         isOpen={isAddQuestionModalOpen}
@@ -352,6 +488,27 @@ function AssessmentManage() {
         onClose={closeUpdateQuestionModal}
         questionData={selectedQuestion}
         onUpdateQuestion={onUpdateQuestion}
+      />
+
+      <AddQuestionSettingsModal
+        isOpen={isModalOpen}
+        onClose={closeAddQuestionSettingsModal}
+        assessmentId={assessmentId}
+        onAddSettings={handleAddQuestions}
+      />
+
+      <GenerateQuestionsAIModal
+        isOpen={isGenerateQuestionsAIModalOpen}
+        onClose={closeGenerateQuestionsAIModal}
+        onSubmit={handleGenerateQuestionsAI}
+        assessmentId={assessmentId}
+      />
+
+      <QuestionBankModal
+        isOpen={isQuestionBankModalOpen}
+        onClose={closeQuestionBankModal}
+        onAddQuestions={handleAddQuestionsFromBank}
+        assessmentId={assessmentId}
       />
     </section>
   );
