@@ -33,7 +33,9 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DJANGO_DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '').split(',')
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 
 # Application definition
@@ -95,10 +97,26 @@ WSGI_APPLICATION = 'django_backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('DATABASE_ENGINE', 'django.db.backends.sqlite3'),
-        'NAME': os.getenv('DATABASE_NAME', BASE_DIR / 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': os.getenv('DATABASE_ENGINE'),
+#         'NAME': os.getenv('RENDER_POSTGRES_DATABASE'),  # Name of your database
+#         'USER': os.getenv('RENDER_POSTGRES_USER'),  # Username
+#         'PASSWORD': os.getenv('RENDER_POSTGRES_PASSWORD'),  # Password
+#         'HOST': os.getenv('RENDER_POSTGRES_HOST'),  # Hostname
+#         'PORT': os.getenv('RENDER_POSTGRES_PORT'),  # Port number
+#         # 'OPTIONS': {
+#         #     'sslmode': 'require',  # Ensure SSL connection is required
+#         # },
+#     }
+# }
+
+# postgresql://ideasassess_user:PnH4Z61HG42MpySZiLBCK1K6KXJFxtG0@dpg-crcedfbqf0us738jqo6g-a.oregon-postgres.render.com/ideasassess
 
 
 # Password validation

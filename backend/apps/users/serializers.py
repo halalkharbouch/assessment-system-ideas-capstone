@@ -62,6 +62,13 @@ class StudentMiniSerializer(serializers.ModelSerializer):
         model = Student
         fields = ['id', 'user', 'admission_number', 'enrolled_course', 'average_score', 'highest_score', 'lowest_score', 'pass_rate', 'results', 'completed_assessments']
 
+class StudentSerializerForResult(serializers.ModelSerializer):
+    user = UserSerializer(required=False, allow_null=True)
+
+    class Meta:
+        model = Student
+        fields = ['id', 'user', 'admission_number']
+
 
 
 class StudentViewSet(viewsets.ReadOnlyModelViewSet):

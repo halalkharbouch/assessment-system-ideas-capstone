@@ -2,6 +2,7 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from django_backend.permissions import IsStaffUser, IsSuperuser
 from ..serializers import TeacherSerializer, UserSerializer
 from ..models import Teacher, User
 from apps.courses.models import Course
@@ -12,7 +13,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class CreateTeacherView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSuperuser, IsStaffUser]
     def post(self, request):
         # Directly get the data from the request
         user_data = request.data.get('user', {})
@@ -91,7 +92,7 @@ class ListTeachersView(generics.ListAPIView):
     serializer_class = TeacherSerializer
 
 class UpdateTeacherView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSuperuser, IsStaffUser]
 
     def put(self, request, pk):
         # Retrieve the teacher object
@@ -168,7 +169,7 @@ class UpdateTeacherView(APIView):
 
     
 class DeleteTeacherView(generics.DestroyAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSuperuser, IsStaffUser]
     queryset = Teacher.objects.all()
     lookup_field = 'pk'
 

@@ -59,6 +59,15 @@ function App() {
           }
         />
         <Route
+          path="/assessment-scores/:assessmentId"
+          element={
+            <PrivateRoute
+              element={StudentsScores}
+              allowedRoles={['superuser', 'teacher']}
+            />
+          }
+        />
+        <Route
           path="/students"
           element={
             <PrivateRoute element={Students} allowedRoles={['superuser']} />
@@ -106,10 +115,7 @@ function App() {
         <Route
           path="/student-scores/:assessmentId"
           element={
-            <PrivateRoute
-              element={StudentsScores}
-              allowedRoles={['student']}
-            />
+            <PrivateRoute element={StudentsScores} allowedRoles={['student']} />
           }
         />
         <Route

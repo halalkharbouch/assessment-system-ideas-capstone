@@ -12,3 +12,16 @@ class ResultSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return Result.objects.create(**validated_data)
+    
+
+class ResultMiniSerializer(serializers.ModelSerializer):
+    student = serializers.SerializerMethodField()
+    class Meta:
+        model = Result
+        fields = ['id', 'student', 'score', 'date_taken']
+
+    def get_student(self, obj):
+        student = obj.student
+        from apps.users.serializers import StudentSerializerForResult
+        serializer = StudentSerializerForResult(student)
+        return serializer.data

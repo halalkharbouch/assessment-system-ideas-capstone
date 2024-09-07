@@ -14,6 +14,7 @@ from apps.users.serializers import StudentSerializer, TeacherSerializer, UserSer
 from apps.results.models import Result
 from django.shortcuts import get_object_or_404
 from apps.choices.models import Choice
+from django_backend.permissions import IsStaffUser, IsSuperuser
 
 class AssessmentListView(generics.ListAPIView):
     queryset = Assessment.objects.all()
@@ -40,7 +41,7 @@ class CurrentUserAssessmentsView(generics.ListAPIView):
         return Assessment.objects.filter(created_by=teacher)
 
 class CreateAssessmentView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsStaffUser]
 
     def post(self, request):
         # Extract data from request
@@ -124,7 +125,7 @@ class CreateAssessmentView(APIView):
 
 
 class UpdateAssessmentView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsStaffUser]
 
     def put(self, request, pk):
         # Fetch the assessment to be updated
@@ -191,7 +192,7 @@ class UpdateAssessmentView(APIView):
         return None
     
 class DeleteAssessmentView(generics.DestroyAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsStaffUser]
     serializer_class = AssessmentSerializer
     queryset = Assessment.objects.all()
 
@@ -204,7 +205,7 @@ class AssessmentDetailView(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated]
 
 class UpdateAssessmentStatusView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsStaffUser]
 
     def patch(self, request, pk):
         # Fetch the assessment to be updated
@@ -243,6 +244,8 @@ class UpdateAssessmentStatusView(APIView):
             return None
 
 class SubmitAssessmentView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, assessment_id):
         # Get the assessment
         assessment = get_object_or_404(Assessment, id=assessment_id)
@@ -299,6 +302,7 @@ class SubmitAssessmentView(APIView):
         student = Student.objects.get(user=user)
         student.results.add(result)
         student.completed_assessments.add(assessment)
+        assessment.results.add(result)
         # Return the calculated score and other relevant information
         return Response(
             {

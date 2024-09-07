@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from django.contrib.auth import authenticate, login, logout 
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from django_backend.permissions import IsStaffUser, IsSuperuser
 from ..serializers import UserSerializer, SetPasswordSerializer, SuperuserSerializer, TeacherSerializer, StudentSerializer, StudentMiniSerializer
 from ..models import User, Student, Teacher
 from django.contrib.auth import get_user_model
@@ -13,7 +14,7 @@ from django.contrib.auth import get_user_model
 CurrentUser = get_user_model()
 
 class CurrentUserView(generics.RetrieveAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsStaffUser]
 
     def get(self, request, *args, **kwargs):
         user = request.user
@@ -40,14 +41,17 @@ class CurrentUserView(generics.RetrieveAPIView):
         }, status=status.HTTP_200_OK)
 
 class ListUsersView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
 class DeleteUserView(generics.DestroyAPIView):
+    permission_classes = [IsAuthenticated, IsStaffUser]
     queryset = User.objects.all()
     lookup_field = 'pk'
 
 class UpdateUserView(generics.UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsStaffUser]
     queryset = User.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'pk'
@@ -66,6 +70,7 @@ class CheckUserExists(APIView):
             return Response({"exists": False})
 
 class SetPassword(APIView):
+    permission_classes = [AllowAny]
     def post(self, request, pk):
         try:
             print("PK: ", pk)

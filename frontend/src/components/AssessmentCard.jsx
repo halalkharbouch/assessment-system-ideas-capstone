@@ -15,6 +15,7 @@ function AssessmentCard({ icon, assessment, onDelete, onStatusToggle }) {
   const [courses, setCourses] = useState([]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  
 
   console.log('Courses', courses);
 
@@ -47,7 +48,7 @@ function AssessmentCard({ icon, assessment, onDelete, onStatusToggle }) {
   };
 
   const handleViewStudentScoresClick = () => {
-    navigate(`/student-scores/${assessment.id}`);
+    navigate(`/assessment-scores/${assessment.id}`);
   };
 
   const handleStatusToggle = async () => {

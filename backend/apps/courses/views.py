@@ -4,20 +4,27 @@ from .models import Course
 from .serializer import CourseSerializer
 from rest_framework.views import APIView
 from apps.users.models import Student
+from django_backend.permissions import IsStaffUser, IsSuperuser
+from rest_framework.permissions import AllowAny, IsAuthenticated
+
 
 class CourseListView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
 
 class CreateCourseView(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated, IsStaffUser]
     serializer_class = CourseSerializer
 
 class UpdateCourseView(generics.UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsStaffUser]
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
     lookup_field = 'pk'
 
 class DeleteCourseView(generics.DestroyAPIView):
+    permission_classes = [IsAuthenticated, IsStaffUser]
     queryset = Course.objects.all()
     lookup_field = 'pk'
 

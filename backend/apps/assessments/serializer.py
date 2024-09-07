@@ -8,6 +8,8 @@ class AssessmentSerializer(serializers.ModelSerializer):
     module = serializers.SerializerMethodField()
     created_by = serializers.StringRelatedField(read_only=True)
     questions = QuestionSerializer(many=True, read_only=True)
+    results = serializers.SerializerMethodField()
+
 
     class Meta:
         model = Assessment
@@ -22,6 +24,11 @@ class AssessmentSerializer(serializers.ModelSerializer):
         from apps.modules.serializer import ModuleSerializer
         serializer = ModuleSerializer(obj.module)
         return serializer.data
+    
+    def get_results(self, obj):
+        from apps.results.serializer import ResultMiniSerializer
+        results = obj.results.all()
+        return ResultMiniSerializer(results, many=True).data
 
 
 class AssessmentMiniSerializer(serializers.ModelSerializer):
@@ -29,13 +36,19 @@ class AssessmentMiniSerializer(serializers.ModelSerializer):
     questions = serializers.SerializerMethodField()
     course = serializers.StringRelatedField()
     module = serializers.StringRelatedField()
+    results = serializers.SerializerMethodField()
 
     class Meta:
         model = Assessment
-        fields = ('id', 'name', 'module', 'course', 'questions', 'is_published', 'start_date', 'end_date', 'time_limit', 'total_marks', 'passing_marks', 'created_by', 'description')
+        fields = ('id', 'name', 'module', 'results', 'course', 'questions', 'is_published', 'start_date', 'end_date', 'time_limit', 'total_marks', 'passing_marks', 'created_by', 'description')
 
     def get_questions(self, obj):
         from apps.questions.serializer import QuestionSerializer
         # Use only essential fields for questions to avoid deep recursion
         questions = obj.questions.all()
         return QuestionSerializer(questions, many=True).data
+    
+    def get_results(self, obj):
+        from apps.results.serializer import ResultMiniSerializer
+        results = obj.results.all()
+        return ResultMiniSerializer(results, many=True).data

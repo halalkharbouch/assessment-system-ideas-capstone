@@ -6,13 +6,14 @@ from ..models import Student, User
 from apps.courses.models import Course
 from apps.modules.models import Module
 from rest_framework.permissions import IsAuthenticated
+from django_backend.permissions import IsStaffUser, IsSuperuser
 from rest_framework.decorators import api_view
 from apps.results.models import Result
 from django.db.models import Count, F, Sum, Avg, Max, Min
 
 
 class CreateStudentView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsStaffUser]
 
     def post(self, request):
         importing_students = request.data.get('importing_students', False)
@@ -145,6 +146,8 @@ class CreateStudentView(APIView):
 
 
 class ListStudentView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+
     serializer_class = StudentSerializer
 
     def get_queryset(self):
@@ -156,7 +159,7 @@ class ListStudentView(generics.ListAPIView):
         return queryset
 
 class UpdateStudentView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsStaffUser]
 
     def put(self, request, pk):
         # Retrieve the student object
@@ -229,10 +232,12 @@ class UpdateStudentView(APIView):
         return modules
     
 class DeleteStudentView(generics.DestroyAPIView):
+    permission_classes = [IsAuthenticated, IsStaffUser]
     queryset = Student.objects.all()
     lookup_field = 'pk'
 
 class StudentDetailView(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
     lookup_field = 'pk'

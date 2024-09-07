@@ -7,9 +7,12 @@ from rest_framework import generics
 from apps.users.models import Student
 from .serializer import ResultSerializer
 from rest_framework import viewsets
+from django_backend.permissions import IsStaffUser, IsSuperuser
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 
 class ResultViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
     queryset = Result.objects.all()
     serializer_class = ResultSerializer
 
@@ -18,7 +21,7 @@ class ResultViewSet(viewsets.ModelViewSet):
 
 # Create your views here.
 class DeleteResultView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsStaffUser]
 
     def delete(self, request, pk):
         result = Result.objects.get(pk=pk)

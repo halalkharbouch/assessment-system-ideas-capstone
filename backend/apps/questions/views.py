@@ -11,6 +11,8 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 from rest_framework import generics 
 from apps.courses.models import Course
+from django_backend.permissions import IsStaffUser, IsSuperuser
+from rest_framework.permissions import AllowAny, IsAuthenticated
 import os
 import json
 import html
@@ -36,6 +38,7 @@ model = genai.GenerativeModel(
 )
 
 class AddQuestionView(APIView):
+    permission_classes = [IsAuthenticated, IsStaffUser]
     def post(self, request, assessment_id):
         try:
             # Retrieve the assessment object
@@ -258,6 +261,7 @@ class AddQuestionView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class UpdateQuestionView(APIView):
+    permission_classes = [IsAuthenticated, IsStaffUser]
     def put(self, request, question_id):
         try:
             # Retrieve the question object
@@ -305,6 +309,7 @@ class UpdateQuestionView(APIView):
 
 
 class DeleteQuestionView(APIView):
+    permission_classes = [IsAuthenticated, IsStaffUser]
     def delete(self, request, question_id):
         try:
             # Retrieve the question object

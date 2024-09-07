@@ -4,8 +4,7 @@ function ConfirmationModal({ assessment, isOpen, onClose, onContinue }) {
   if (!isOpen) return null;
 
   const timeLimitString = assessment.time_limit;
-  const [hours, minutes, seconds] = timeLimitString.split(':').map(Number);
-  const totalMinutes = hours * 60 + minutes + seconds / 60;
+  const formattedTimeLimit = parseInt(timeLimitString) / 60;
 
   return (
     <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
@@ -21,7 +20,7 @@ function ConfirmationModal({ assessment, isOpen, onClose, onContinue }) {
           <strong>Total Questions:</strong> {assessment.questions.length}
         </p>
         <p className="mb-4">
-          <strong>Time Limit:</strong> {totalMinutes} Minutes
+          <strong>Time Limit:</strong> {formattedTimeLimit} Minutes
         </p>
         <p className="text-red-600 mb-4">
           Please make sure you are ready and have a stable Internet Connection
