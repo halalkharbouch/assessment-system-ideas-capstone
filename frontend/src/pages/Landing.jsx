@@ -58,6 +58,8 @@ const Landing = () => {
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoadingState(true);
+      dispatch(setLoading(true));
       const response = await axiosInstance.post(
         '/api/auth/check-user-exists/',
         { email },
@@ -76,7 +78,11 @@ const Landing = () => {
         toast.error('User does not exist');
       }
     } catch (error) {
+      console.error(error);
       toast.error('Error checking user');
+    } finally {
+      setLoadingState(false);
+      dispatch(setLoading(false));
     }
   };
 

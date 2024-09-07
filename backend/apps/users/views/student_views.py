@@ -284,16 +284,17 @@ def pass_rate(request):
 
     for student in students:
         total_assessments = student.results.count()
-        passed_assessments = student.results.filter(
-            score__gte=F('assessment__passing_marks')
-        ).count()
+        if total_assessments > 0:
+            passed_assessments = student.results.filter(
+                score__gte=F('assessment__passing_marks')
+            ).count()
 
-        pass_rate_percentage = (passed_assessments / total_assessments * 100) if total_assessments else 0
+            pass_rate_percentage = (passed_assessments / total_assessments * 100) if total_assessments else 0
 
-        if pass_rate_percentage >= 50:  # Assuming 50% is the threshold for pass
-            pass_count += 1
-        else:
-            fail_count += 1
+            if pass_rate_percentage >= 50:  # Assuming 50% is the threshold for pass
+                pass_count += 1
+            else:
+                fail_count += 1
     
     # Prepare data for the pie chart
     pass_rate_data = [

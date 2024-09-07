@@ -15,7 +15,6 @@ function AssessmentCard({ icon, assessment, onDelete, onStatusToggle }) {
   const [courses, setCourses] = useState([]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  
 
   console.log('Courses', courses);
 
@@ -53,19 +52,43 @@ function AssessmentCard({ icon, assessment, onDelete, onStatusToggle }) {
 
   const handleStatusToggle = async () => {
     try {
+      // Fetch the questions for this assessment
+      const questions = assessment.questions; // Assume you have a function to get the assessment questions
+      const totalQuestionMarks = questions.reduce(
+        (acc, question) => acc + question.marks,
+        0
+      );
+  
+      // Compare the total question marks with the assessment total marks
+      if (totalQuestionMarks < assessment.total_marks) {
+        toast.warning(
+          `The total marks of the questions (${totalQuestionMarks}) are less than the assessment total marks (${assessment.total_marks}). Please update the assessment marks.`,
+        );
+        return; // Stop further execution if the marks are less
+      }
+  
+      if (totalQuestionMarks > assessment.total_marks) {
+        toast.warning(
+          `The total marks of the questions (${totalQuestionMarks}) are greater than the assessment total marks (${assessment.total_marks}). Please update the assessment marks.`,
+        );
+        return; // Stop further execution if the marks are greater
+      }
+  
+      // If the marks match, proceed with toggling the status
       const newStatus = !assessment.is_published; // Toggle the publish status
       const updatedAssessment = await updateAssessmentStatus(
         assessment.id,
         newStatus,
       );
-
-      onStatusToggle(updatedAssessment);
+  
+      onStatusToggle(updatedAssessment); // Update the parent component state
       toast.success('Assessment status updated successfully');
     } catch (error) {
       console.error(error);
       toast.error('Failed to update assessment status');
     }
   };
+  
 
   return (
     <div className="p-4 lg:w-1/2 md:w-full">
@@ -74,19 +97,7 @@ function AssessmentCard({ icon, assessment, onDelete, onStatusToggle }) {
           assessment.is_published ? 'animate-pulse' : ''
         }`}
       >
-        <div className="w-16 h-16 sm:mr-8 sm:mb-0 mb-4 inline-flex items-center justify-center rounded-full bg-indigo-100 text-indigo-500 flex-shrink-0">
-          <svg
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            className="w-8 h-8"
-            viewBox="0 0 24 24"
-          >
-            {icon}
-          </svg>
-        </div>
+        
         <div className="flex-grow">
           <div className="flex justify-between">
             <h2 className="text-gray-900 text-lg font-bold title-font mb-3">
@@ -133,7 +144,7 @@ function AssessmentCard({ icon, assessment, onDelete, onStatusToggle }) {
               onClick={handleViewStudentScoresClick}
               className="mt-3 text-indigo-500 inline-flex items-center cursor-pointer"
             >
-              View Students Scores
+              Scores
               <svg
                 fill="none"
                 stroke="currentColor"

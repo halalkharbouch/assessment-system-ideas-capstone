@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { addUser, fetchCurrentUser } from '../../services/users.service.js';
 import CreatableSelect from 'react-select/creatable';
+import ClipLoader from 'react-spinners/ClipLoader.js';
 
 function AddTeacherModal({
   isOpen,
@@ -23,6 +24,7 @@ function AddTeacherModal({
 
   const [loading, setLoading] = useState(false);
   const [selectedCourses, setSelectedCourses] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -95,6 +97,7 @@ function AddTeacherModal({
       onClose();
     } catch (error) {
       console.log(error);
+      setError("An error occurred while adding the teacher.");
     } finally {
       setLoading(false);
     }
@@ -201,11 +204,13 @@ function AddTeacherModal({
           </button>
           <button
             onClick={handleSubmit}
+            disabled={loading}
             className="bg-indigo-500 text-white py-2 px-4 rounded"
           >
-            {loading ? 'Loading...' : 'Add Teacher'}
+            {loading ? <ClipLoader size={20} color={'#fff'} />  : 'Add Teacher'}
           </button>
         </div>
+        {error && <p className="text-red-500 mt-4">{error}</p>}
       </div>
     </div>
   );

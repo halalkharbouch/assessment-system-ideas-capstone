@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { FaEdit, FaSearch, FaTrash } from 'react-icons/fa';
 import AddStudentModal from '../components/Modals/AddStudentModal';
 import { fetchUsers, deleteUser } from '../services/users.service.js';
@@ -12,13 +12,11 @@ function Students() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // Correctly handle loading state
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
-
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const studentsPerPage = 10;
-
   const [allCourses, setAllCourses] = useState([]);
 
   const openModal = () => setIsModalOpen(true);
@@ -44,25 +42,64 @@ function Students() {
 
   useEffect(() => {
     const loadStudents = async () => {
-      const data = await fetchUsers('students');
-      setStudents(data);
+      try {
+        const data = await fetchUsers('students');
+        setStudents(data);
+      } catch (error) {
+        console.error(error);
+      }
     };
+
     const loadCourses = async () => {
-      const data = await fetchCourses();
-      const formattedCourses = data.map((course) => ({
-        value: course.id,
-        label: course.name,
-      }));
-      setAllCourses(formattedCourses);
+      try {
+        const data = await fetchCourses();
+        const formattedCourses = data.map((course) => ({
+          value: course.id,
+          label: course.name,
+        }));
+        setAllCourses(formattedCourses);
+      } catch (error) {
+        console.error(error);
+      }
     };
-    loadCourses();
-    loadStudents();
-    setLoading(false);
+
+    // Fetch students and courses in parallel
+    Promise.all([loadStudents(), loadCourses()])
+      .then(() => setLoading(false)) // Only stop loading after data is fetched
+      .catch((error) => {
+        console.error(error);
+        setLoading(false); // Stop loading in case of error
+      });
   }, []);
 
-  if (loading) {
-    return <Loading />;
-  }
+  // Memoize filtered students for performance optimization
+  const filteredStudents = useMemo(() => {
+    return students.filter(
+      (student) =>
+        student.user.first_name
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        student.user.last_name
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        student.user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        student.admission_number
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        (student.enrolled_course?.name ?? '')
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()),
+    );
+  }, [students, searchQuery]);
+
+  // Memoize pagination logic
+  const currentStudents = useMemo(() => {
+    const indexOfLastStudent = currentPage * studentsPerPage;
+    const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
+    return filteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
+  }, [filteredStudents, currentPage]);
+
+  const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
 
   const handleAddStudent = (newStudent) => {
     setStudents([...students, newStudent]);
@@ -76,8 +113,6 @@ function Students() {
   };
 
   const handleUpdateStudent = (updatedStudent) => {
-    console.log('Updated Student is: ', updatedStudent);
-
     setStudents((prevStudents) =>
       prevStudents.map((student) =>
         student.id === updatedStudent.id ? updatedStudent : student,
@@ -94,35 +129,11 @@ function Students() {
     setStudents([...students, ...newStudents]);
   };
 
-  // Filter students based on search query
-  const filteredStudents = students.filter(
-    (student) =>
-      student.user.first_name
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      student.user.last_name
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      student.user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      student.admission_number
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      (student.enrolled_course?.name ?? '')
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()),
-  );
-
-  // Pagination logic
-  const indexOfLastStudent = currentPage * studentsPerPage;
-  const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
-  const currentStudents = filteredStudents.slice(
-    indexOfFirstStudent,
-    indexOfLastStudent,
-  );
-
-  const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
-
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <section className="text-gray-600 body-font">
@@ -175,7 +186,7 @@ function Students() {
                     <FaEdit
                       onClick={() => openEditModal(student)}
                       className="text-green-500 cursor-pointer hover:text-green-600 hover:scale-95 transition duration-150 ease-in-out"
-                    />{' '}
+                    />
                     <FaTrash
                       onClick={() => handleDeleteStudent(student.user.id)}
                       className="text-red-500 cursor-pointer hover:text-red-600 hover:scale-95 transition duration-150 ease-in-out"

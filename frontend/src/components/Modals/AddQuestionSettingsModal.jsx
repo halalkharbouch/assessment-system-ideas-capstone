@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import CreatableSelect from 'react-select/creatable';
 import { addQuestion } from '../../services/aseessment.service';
 import { useNavigate } from 'react-router-dom';
+import ClipLoader from 'react-spinners/ClipLoader';
 
 function AddQuestionSettingsModal({
   isOpen,
@@ -214,9 +215,10 @@ function AddQuestionSettingsModal({
             </button>
             <button
               type="submit"
+              disabled={loading}
               className="bg-indigo-500 text-white py-2 px-4 rounded"
             >
-              {loading ? 'Loading...' : 'Submit'}
+              {loading ? <ClipLoader size={20} color={'#fff'} />  : 'Submit'}
             </button>
           </div>
         </form>

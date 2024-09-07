@@ -3,6 +3,7 @@ import CreatableSelect from 'react-select/creatable';
 import Select from 'react-select';
 import axiosInstance from '../../api/axios';
 import { addQuestion } from '../../services/aseessment.service';
+import ClipLoader from 'react-spinners/ClipLoader';
 
 function AddQuestionModal({
   isOpen,
@@ -271,11 +272,13 @@ function AddQuestionModal({
           </button>
           <button
             onClick={handleSubmit}
+            disabled={loading}
             className="bg-indigo-500 text-white py-2 px-4 rounded"
           >
-            {loading ? 'Loading...' : 'Add Question'}
+            {loading ? <ClipLoader size={20} color={'#fff'} />  : 'Add Question'}
           </button>
         </div>
+        {error && <p className="text-red-500 mt-4">{error}</p>}
       </div>
     </div>
   );

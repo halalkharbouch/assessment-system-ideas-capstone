@@ -19,6 +19,8 @@ const QuestionBankModal = ({
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const [error, setError] = useState(null);
+
   console.log(questions);
 
   useEffect(() => {
@@ -76,6 +78,7 @@ const QuestionBankModal = ({
       toast.success('Questions added successfully!');
     } catch (error) {
       console.error(error);
+      setError('An error occurred while adding questions.');
       toast.error('An error occurred while adding questions.');
     } finally {
       setLoading(false);
@@ -166,6 +169,7 @@ const QuestionBankModal = ({
             )}
           </button>
         </div>
+        {error && <p className="text-red-500 mt-4">{error}</p>}
       </div>
     </div>
   );

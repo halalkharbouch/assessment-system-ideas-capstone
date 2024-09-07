@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { updateUser } from '../../services/users.service.js';
 import { fetchCourses } from '../../services/course.service.js';
 import CreatableSelect from 'react-select/creatable';
+import ClipLoader from 'react-spinners/ClipLoader.js';
 
 function UpdateStudentModal({
   isOpen,
@@ -22,6 +23,7 @@ function UpdateStudentModal({
     enrolled_course: null,
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [selectedCourses, setSelectedCourses] = useState([]);
 
   useEffect(() => {
@@ -85,6 +87,7 @@ function UpdateStudentModal({
       onUpdateStudent(newStudent);
       onClose();
     } catch (error) {
+      setError('An error occurred while updating the student.');
       console.error('Failed to update student:', error);
     } finally {
       setLoading(false);
@@ -188,9 +191,10 @@ function UpdateStudentModal({
               disabled={loading}
               className="bg-indigo-500 text-white py-2 px-4 rounded"
             >
-              {loading ? 'Loading...' : 'Update Student'}
+              {loading ? <ClipLoader size={20} color={'#fff'} />  : 'Update Student'}
             </button>
           </div>
+          {error && <p className="text-red-500 mt-4">{error}</p>}
         </form>
       </div>
     </div>

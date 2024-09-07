@@ -4,6 +4,7 @@ import { fetchCurrentUser, updateUser } from '../../services/users.service.js';
 import CreatableSelect from 'react-select/creatable';
 import { updateCurrentUser } from '../../redux/userSlice.js';
 import { useDispatch } from 'react-redux';
+import ClipLoader from 'react-spinners/ClipLoader.js';
 
 function UpdateTeacherModal({
   isOpen,
@@ -19,6 +20,7 @@ function UpdateTeacherModal({
     modules: {},
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [selectedCourses, setSelectedCourses] = useState([]);
 
   const dispatch = useDispatch();
@@ -119,6 +121,7 @@ function UpdateTeacherModal({
 
       onClose();
     } catch (error) {
+      setError("An error occurred while updating the teacher.");
       console.error('Failed to update teacher:', error);
     } finally {
       setLoading(false);
@@ -236,10 +239,11 @@ function UpdateTeacherModal({
               disabled={loading}
               className="bg-indigo-500 text-white py-2 px-4 rounded"
             >
-              {loading ? 'Loading...' : 'Update Teacher'}
+              {loading ? <ClipLoader size={20} color={'#fff'} />  : 'Update Teacher'}
             </button>
           </div>
         </form>
+        {error && <p className="text-red-500 mt-4">{error}</p>}
       </div>
     </div>
   );

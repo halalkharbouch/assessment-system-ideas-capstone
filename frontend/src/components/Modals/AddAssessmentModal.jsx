@@ -4,6 +4,7 @@ import CreatableSelect from 'react-select/creatable';
 import Select from 'react-select';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useDispatch, useSelector } from 'react-redux';
+import ClipLoader from 'react-spinners/ClipLoader';
 
 function AddAssessmentModal({ isOpen, onClose, onCreate }) {
   const [startDateTime, setStartDateTime] = useState(null);
@@ -11,8 +12,8 @@ function AddAssessmentModal({ isOpen, onClose, onCreate }) {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    module: 1,
-    course: 1,
+    module: null,
+    course: null,
     created_by: null,
     time_limit: 60,
     total_marks: 100,
@@ -23,6 +24,8 @@ function AddAssessmentModal({ isOpen, onClose, onCreate }) {
 
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [selectedModule, setSelectedModule] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -30,10 +33,15 @@ function AddAssessmentModal({ isOpen, onClose, onCreate }) {
 
   useEffect(() => {
     if (isOpen) {
-      setFormData((prevData) => ({
-        ...prevData,
-        created_by: currentUser.id,
-      }));
+      setFormData({
+        name: '',
+        description: '',
+        module: null,
+        course: null,
+        time_limit: 60,
+        total_marks: 100,
+        passing_marks: 90,
+      });
     }
   }, [isOpen, currentUser.id]);
 
@@ -68,12 +76,21 @@ function AddAssessmentModal({ isOpen, onClose, onCreate }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const dataToSubmit = {
       ...formData,
       start_date: startDateTime,
       end_date: endDateTime,
       created_by: currentUser.id,
     };
+    try {
+      onCreate(dataToSubmit);
+    } catch (error) {
+      setError("An error occurred while adding the assessment.");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
     onCreate(dataToSubmit);
   };
 
@@ -258,10 +275,12 @@ function AddAssessmentModal({ isOpen, onClose, onCreate }) {
           <button
             className="bg-indigo-500 text-white py-2 px-4 rounded"
             onClick={handleSubmit}
+            disabled={loading}
           >
-            Add Assessment
+            {loading ? <ClipLoader size={20} color={'#fff'} /> : 'Add Assessment'}
           </button>
         </div>
+        {error && <p className="text-red-500 mt-4">{error}</p>}
       </div>
     </div>
   );

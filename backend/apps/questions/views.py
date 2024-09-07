@@ -67,7 +67,7 @@ class AddQuestionView(APIView):
                     question_text = html.unescape(q.get('question', ''))
                     q_type = q.get('type')
 
-                    # Map OpenTDB types to your internal question types
+                    # Map OpenTDB types to your my question types
                     if q_type == 'multiple':
                         question_type = 'mcq'
                     elif q_type == 'boolean':

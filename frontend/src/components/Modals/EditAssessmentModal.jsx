@@ -25,6 +25,8 @@ function EditAssessmentModal({
 
   const [loading, setLoading] = useState(false);
 
+  const [error, setError] = useState(null);
+
   useEffect(() => {
     if (assessmentData && isOpen && timeLimit) {
       setFormData({
@@ -78,7 +80,7 @@ function EditAssessmentModal({
       onUpdate(newUpdatedAssessment);
     } catch (error) {
       console.error('Error updating assessment:', error);
-      // Optionally, handle error (e.g., show an error message)
+      setError('An error occurred while updating the assessment.');
     } finally {
       setLoading(false);
     }
@@ -255,6 +257,7 @@ function EditAssessmentModal({
             </button>
           </div>
         </form>
+        {error && <p className="text-red-500 mt-4">{error}</p>}
       </div>
     </div>
   );

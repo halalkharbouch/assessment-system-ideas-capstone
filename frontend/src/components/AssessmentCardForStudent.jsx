@@ -45,19 +45,7 @@ function AssessmentCardForStudent({
           assessment.is_published ? 'animate-pulse' : ''
         }`}
       >
-        <div className="w-16 h-16 sm:mr-8 sm:mb-0 mb-4 inline-flex items-center justify-center rounded-full bg-indigo-100 text-indigo-500 flex-shrink-0">
-          <svg
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            className="w-8 h-8"
-            viewBox="0 0 24 24"
-          >
-            {icon}
-          </svg>
-        </div>
+        
         <div className="flex-grow">
           <div className="flex justify-between">
             <h2 className="text-gray-900 text-lg font-bold title-font mb-3">

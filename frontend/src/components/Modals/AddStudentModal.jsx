@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import CreatableSelect from 'react-select/creatable';
 import { addUser } from '../../services/users.service.js';
+import ClipLoader from 'react-spinners/ClipLoader.js';
 
 function AddStudentModal({ isOpen, onClose, onAddStudent, allCourses }) {
   const [formData, setFormData] = useState({
@@ -152,6 +153,7 @@ function AddStudentModal({ isOpen, onClose, onAddStudent, allCourses }) {
               type="email"
               id="email"
               name="email"
+              required
               className="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 py-1 px-3 text-gray-700"
             />
           </div>
@@ -185,6 +187,7 @@ function AddStudentModal({ isOpen, onClose, onAddStudent, allCourses }) {
               type="text"
               id="admission_number"
               name="admission_number"
+              required
               className="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 py-1 px-3 text-gray-700"
             />
           </div>
@@ -199,9 +202,10 @@ function AddStudentModal({ isOpen, onClose, onAddStudent, allCourses }) {
             </button>
             <button
               type="submit"
+              disabled={loading}
               className="bg-indigo-500 text-white py-2 px-4 rounded"
             >
-              {loading ? 'Loading...' : 'Add Student'}
+              {loading ? <ClipLoader size={20} color={'#fff'} />  : 'Add Student'}
             </button>
           </div>
         </form>

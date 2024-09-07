@@ -6,9 +6,11 @@ import Loading from '../components/Loading';
 import { FaBook, FaLayerGroup, FaCalendarAlt } from 'react-icons/fa';
 import axiosInstance from '../api/axios';
 import { toast } from 'react-toastify';
+import { ClipLoader } from 'react-spinners';
 
 function Timer({ initialTime, onTimeUp }) {
   const [timeLeft, setTimeLeft] = useState(initialTime);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (timeLeft <= 0) {
@@ -54,6 +56,7 @@ function AssessmentTake() {
   const focusTimeoutRef = useRef(null);
 
   const handleSubmit = useCallback(async () => {
+    setLoading(true);
     try {
       await axiosInstance.post(`/api/assessments/submit/${assessmentId}/`, {
         answers,
@@ -63,6 +66,8 @@ function AssessmentTake() {
     } catch (error) {
       console.error(error);
       toast.error('Failed to submit assessment');
+    } finally {
+      setLoading(false);
     }
   }, [assessmentId, answers, navigate]);
 
@@ -333,10 +338,15 @@ function AssessmentTake() {
           <Timer initialTime={timeLimit} onTimeUp={handleSubmit} />
 
           <button
+            disabled={loading}
             className="bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600"
             onClick={handleSubmit}
           >
-            Submit Assessment
+            {loading ? (
+              <ClipLoader size={20} color={'#fff'} />
+            ) : (
+              'Submit Assessment'
+            )}
           </button>
         </div>
       </div>

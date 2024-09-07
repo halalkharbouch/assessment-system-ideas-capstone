@@ -10,6 +10,7 @@ function ImportStudentsModal({ isOpen, onClose, allCourses, onAddStudents }) {
   const [selectedCourseHeader, setSelectedCourseHeader] = useState('');
   const [distinctCourses, setDistinctCourses] = useState([]);
   const [courseMappings, setCourseMappings] = useState({});
+  const [error, setError] = useState(null);
   const [fieldMappings, setFieldMappings] = useState({
     first_name: '',
     last_name: '',
@@ -102,6 +103,7 @@ function ImportStudentsModal({ isOpen, onClose, allCourses, onAddStudents }) {
     } catch (error) {
       console.log(error);
       toast.error('Failed to import students');
+      setError("An error occurred while importing the students.");
     } finally {
       setLoading(false);
       onClose();
@@ -204,6 +206,7 @@ function ImportStudentsModal({ isOpen, onClose, allCourses, onAddStudents }) {
               {loading ? <ClipLoader size={20} color={'#fff'} /> : 'Import'}
             </button>
           </div>
+          {error && <p className="text-red-500 mt-4">{error}</p>}
         </div>
       </div>
     )
