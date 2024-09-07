@@ -116,8 +116,6 @@ DATABASES = {
 #     }
 # }
 
-# postgresql://ideasassess_user:PnH4Z61HG42MpySZiLBCK1K6KXJFxtG0@dpg-crcedfbqf0us738jqo6g-a.oregon-postgres.render.com/ideasassess
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
