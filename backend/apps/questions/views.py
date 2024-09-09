@@ -67,7 +67,7 @@ class AddQuestionView(APIView):
                     question_text = html.unescape(q.get('question', ''))
                     q_type = q.get('type')
 
-                    # Map OpenTDB types to your my question types
+                    # Map OpenTDB types to your internal question types
                     if q_type == 'multiple':
                         question_type = 'mcq'
                     elif q_type == 'boolean':
@@ -116,23 +116,23 @@ class AddQuestionView(APIView):
 
                 prompt = f"""{material}
                 Generate {number_of_questions} multiple-choice questions in the following JSON format: {{
-                  "questions": [
+                    "questions": [
                     {{
-                      "question": "",
-                      "correct_answer": "",
-                      "incorrect_answers": ["", "", ""]
+                        "question": "",
+                        "correct_answer": "",
+                        "incorrect_answers": ["", "", ""]
                     }},
                     {{
-                      "question": "",
-                      "correct_answer": "",
-                      "incorrect_answers": ["", "", ""]
+                        "question": "",
+                        "correct_answer": "",
+                        "incorrect_answers": ["", "", ""]
                     }},
                     {{
-                      "question": "",
-                      "correct_answer": "",
-                      "incorrect_answers": ["", "", ""]
+                        "question": "",
+                        "correct_answer": "",
+                        "incorrect_answers": ["", "", ""]
                     }}
-                  ]
+                    ]
                 }}. Ensure that each question has a 'question' field for the question text, a 'correct_answer' field for the correct answer, and an 'incorrect_answers' field as an array for the wrong options. Do not include any code block formatting or additional text."""
 
                 chat_session = model.start_chat(history=[])

@@ -172,7 +172,7 @@ class LoginView(APIView):
             "refresh_token": refresh_token,
         })
     
-
+                                    
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 

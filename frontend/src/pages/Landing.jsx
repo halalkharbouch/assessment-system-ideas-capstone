@@ -13,14 +13,13 @@ import LandingImg from '../assets/images/landing-image.webp';
 const Landing = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isFirstLogin, userId, currentUser } = useSelector(
-    (state) => state.user,
-  );
+  const { isFirstLogin, currentUser } = useSelector((state) => state.user);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoadingState] = useState(false);
+  const [showMobileWarning, setShowMobileWarning] = useState(false); // Mobile Warning
 
   useEffect(() => {
     if (currentUser) {
@@ -30,7 +29,16 @@ const Landing = () => {
           : '/dashboard/student-performance',
       );
     }
+
+    // Detect if the user is on a mobile device
+    if (window.innerWidth <= 768) {
+      setShowMobileWarning(true); // Show the warning modal on mobile screens
+    }
   }, [currentUser, navigate]);
+
+  const closeWarning = () => {
+    setShowMobileWarning(false); // Close the modal
+  };
 
   const handleApiCall = async (
     apiCall,
@@ -131,24 +139,42 @@ const Landing = () => {
   };
 
   return (
-    <div className="flex min-h-screen">
-      {/* Left Side (Form) */}
-      <div className="w-1/2 flex flex-col justify-center p-12">
-        <div className="mb-8">
-          <img src={BazeLgo} className="h-20" alt="Baze Logo" />
+    <div className="flex flex-col min-h-screen bg-white lg:flex-row">
+      {/* Mobile Warning Modal */}
+      {showMobileWarning && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-md text-center">
+            <h2 className="text-lg font-bold mb-4">Notice</h2>
+            <p className="text-gray-600">
+              This site is currently not optimized for mobile devices due to
+              security reasons on proctoring assessments. Please use a laptop or
+              desktop for better performance.
+            </p>
+            <button
+              onClick={closeWarning}
+              className="mt-4 py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              Close
+            </button>
+          </div>
         </div>
-        <h1 className="text-4xl font-bold mb-4">
+      )}
+
+      {/* Left Side (Form) */}
+      <div className="w-full lg:w-1/2 flex flex-col justify-center p-6 lg:p-12 bg-white">
+        <div className="mb-6 lg:mb-8">
+          <img src={BazeLgo} className="h-16 mx-auto lg:h-20 lg:mx-0" alt="Baze Logo" />
+        </div>
+        <h1 className="text-3xl lg:text-4xl font-bold mb-4 text-center lg:text-left">
           IDEAS <span className="text-blue-500">Assess</span>
         </h1>
-        <p className="text-gray-600">
+        <p className="text-gray-600 text-center lg:text-left">
           Welcome to the Integrated Digital Evaluation and Assessment System
-          assessment platform, IDEAS Assess for IDEAS Baze program sponsored by
-          World Bank. Login to continue.
+          platform. Login to continue.
         </p>
 
-        {/* Form */}
         <form
-          className="space-y-4 mt-8"
+          className="space-y-4 mt-6 lg:mt-8"
           onSubmit={
             isFirstLogin === null
               ? handleEmailSubmit
@@ -157,7 +183,7 @@ const Landing = () => {
               : handleLogin
           }
         >
-          <p className="uppercase mb-3 text-blue-500">
+          <p className="uppercase mb-3 text-blue-500 text-center lg:text-left">
             {isFirstLogin === null
               ? 'Sign in to Continue'
               : isFirstLogin
@@ -209,7 +235,7 @@ const Landing = () => {
       </div>
 
       {/* Right Side (Image) */}
-      <div className="w-1/2 m-4 bg-transparent text-white relative flex items-center justify-center">
+      <div className="w-full lg:w-1/2 bg-transparent text-white relative flex items-center justify-center">
         <img
           src={LandingImg}
           alt="Illustration"
